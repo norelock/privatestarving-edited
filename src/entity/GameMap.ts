@@ -2,9 +2,6 @@ import { Vector } from "matter-js";
 import { MapEntity, MapEntityType } from './MapEntity';
 import GameServer from '../GameServer';
 import Matter from "matter-js";
-import * as config from "../data/config.json";
-import EntityType from "./EntityType";
-import Entity from "./Entity";
 
 export class Bounds {
     min: Vector;
@@ -68,7 +65,7 @@ export class Eu1Map implements GameMap {
     async initialize(gameServer: GameServer) {
         const mapJson = await import("../data/map/eu1.json");
 
-        this.mapBounds = new Bounds({ x: 0, y: 0 }, { x: mapJson.width * 100, y: mapJson.height * 100 })
+        this.mapBounds = new Bounds({ x: 0, y: 0 }, { x: mapJson.width * 100, y: mapJson.height * 100 });
         this.biomes = [
             new GameBiome(BiomeType.Winter, new Bounds({ x: 1272, y: 4382 }, { x: 11228, y: 13607 })),
             new GameBiome(BiomeType.Lava, new Bounds({ x: 3200, y: 15880 }, { x: 11720, y: 24010 })),
@@ -85,6 +82,7 @@ export class Eu1Map implements GameMap {
                 for (const rows of columns) {
                     if (rows) {
                         for (const type in rows) {
+                            // noinspection JSUnfilteredForInLoop
                             const entity = rows[type];
                             if (type && entity) {
                                 let pos: any = {};

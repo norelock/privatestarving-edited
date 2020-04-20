@@ -43,7 +43,7 @@ wss.on('connection', (ws) => {
         return;
     }
 
-    var player = gameServer.findPlayerByWs(ws);
+    let player = gameServer.findPlayerByWs(ws);
     ws.on('message', (message) => {
         try {
             if (typeof message == "string") {
@@ -63,7 +63,7 @@ wss.on('connection', (ws) => {
 
                     Utils.sendPacket(ws, new HandshakeResponse(player, config.maxPlayers, gameServer.players, gameServer.night, gameServer.time, gameServer.map.seed));
 
-                    for (var otherPlayer of gameServer.players.filter(x => x != player)) {
+                    for (const otherPlayer of gameServer.players.filter(x => x != player)) {
                         Utils.sendPacket(otherPlayer.ws, new NewPlayerPacket(player));
                         otherPlayer.sendLeaderboard(gameServer);
                     }
@@ -128,17 +128,17 @@ wss.on('connection', (ws) => {
                                 }
                                 break;
                             case 8:
-                                let item = Item.list.findId(json[1]);
+                                let localItem = Item.list.findId(json[1]);
                                 const amount = json[2];
-                                const ownerId = json[3];
-                                const entityId = json[4];
-                                if (item && amount) {
-                                    let entity = gameServer.entities.find(x => x.id == entityId && x.owner && x.owner.id == ownerId);
-                                    if (entity && entity instanceof ChestEntity && player.inventory.containsItem(item, amount)) {
-                                        if (entity.inventory && entity.inventory.item == item) {
+                                const localOwnerId = json[3];
+                                const localEntityId = json[4];
+                                if (localItem && amount) {
+                                    let entity = gameServer.entities.find(x => x.id == localEntityId && x.owner && x.owner.id == localOwnerId);
+                                    if (entity && entity instanceof ChestEntity && player.inventory.containsItem(localItem, amount)) {
+                                        if (entity.inventory && entity.inventory.item == localItem) {
                                             entity.inventory.amount += amount;
                                         } else {
-                                            entity.inventory = new ItemStack(item, amount);
+                                            entity.inventory = new ItemStack(localItem, amount);
                                         }
                                         entity.action = true;
                                         player.inventory.removeItem(item, RemoveType.Amount, amount);
@@ -183,13 +183,13 @@ wss.on('connection', (ws) => {
                                 if (player.crafting)
                                     break;
 
-                                var recipe = Recipe.list.findId(json[1]);
+                                const recipe = Recipe.list.findId(json[1]);
 
                                 if (recipe && recipe.ingredients.every(function (ingredient) {
-                                    var item = Item.list.findId(ingredient[0]);
+                                    const item = Item.list.findId(ingredient[0]);
                                     return item && player && player.inventory.containsItem(item, ingredient[1]);
                                 })) {
-                                    var result = Item.list.findId(recipe.result);
+                                    const result = Item.list.findId(recipe.result);
 
                                     if (recipe.fire && !Utils.hasFlag(player.source, Source.Fire)) {
                                         break;
@@ -253,7 +253,7 @@ wss.on('connection', (ws) => {
             }
         } catch (error) {
             if (player) {
-                player.sendMessage("Error occurred!")
+                player.sendMessage("Error occurred!");
                 console.error(player);
             }
             console.error(error);
@@ -273,7 +273,7 @@ wss.on('connection', (ws) => {
         }
 
         if (code != 0 && code != 1005) {
-            var error: string = "Empty reason";
+            let error: string = "Empty reason";
             if (reason && reason.length > 0) {
                 error += reason;
             }

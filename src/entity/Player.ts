@@ -146,14 +146,12 @@ export default class Player extends Entity implements ICommandSource {
             }
         }
 
-        var max = stat === StatType.Health ? 200 : 100;
+        const max = stat === StatType.Health ? 200 : 100;
         this.stats[stat] = value;
         if (this.stats[stat] >= max) {
             this.stats[stat] = max;
-            switch (stat) {
-                case StatType.Temperature:
-                    this.setStat(StatType.Overheat, this.overheat - 2, damager, damageReason);
-                    break;
+            if (stat === StatType.Temperature) {
+                this.setStat(StatType.Overheat, this.overheat - 2, damager, damageReason);
             }
         }
         if (this.stats[stat] <= 0) {
@@ -203,8 +201,8 @@ export default class Player extends Entity implements ICommandSource {
 
     public toString = (): string => {
         return `${this.nickname} (${this.id})`;
-    }
-    ''
+    };;
+    '';;
 
     constructor (gameServer: GameServer, handshake: HandshakePacket, ws: any) {
         super(gameServer, EntityType.list[0]);

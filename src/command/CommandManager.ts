@@ -173,7 +173,7 @@ export default class CommandManager {
                                 index++;
                                 break;
                             case String:
-                                const string = args[index];
+                                let string = args[index];
                                 if (i === cmdArgs.length - 1) {
                                     string += " " + args.slice(index + 1).join(" ");
                                 }

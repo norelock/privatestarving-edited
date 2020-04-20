@@ -1,9 +1,8 @@
 import JsonPacket from "./JsonPacket";
-import { PlayerSkin } from '../../entity/Player';
 import Player from '../../entity/Player';
 
 export default class NewPlayerPacket implements JsonPacket {
-    player: Player
+    player: Player;
 
     constructor(player: Player) {
         this.player = player;

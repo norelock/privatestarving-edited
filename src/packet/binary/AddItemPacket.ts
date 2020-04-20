@@ -11,7 +11,7 @@ export class AddItemPacket implements BinaryPacket {
 
     build(): Uint8Array {
         return new Uint8Array([3, 0].concat(...this.items.map(x => {
-            var amount = Utils.sliceToBytes(x.amount);
+            const amount = Utils.sliceToBytes(x.amount);
             return [x.item.id, 0].concat(amount);
         })));
     }

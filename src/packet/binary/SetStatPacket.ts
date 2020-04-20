@@ -1,5 +1,4 @@
 import BinaryPacket from './BinaryPacket';
-import { Stats } from '../../Utils';
 import Player from '../../entity/Player';
 
 export enum StatType {

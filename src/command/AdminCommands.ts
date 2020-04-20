@@ -1,5 +1,5 @@
 import { Command, MetaType } from './CommandManager';
-import Item, { ItemStack } from '../entity/Item';
+import { ItemStack } from '../entity/Item';
 import Player from '../entity/Player';
 import 'reflect-metadata';
 import GameServer from '../GameServer';

@@ -15,7 +15,7 @@ import { JsonConvert } from 'json2typescript';
 import Utils from './Utils';
 import * as config from "./data/config.json";
 import { UnitsPacket, DeletePacket } from './packet/binary/UnitsPacket';
-import { MapEntity, MapEntityType } from './entity/MapEntity';
+import { MapEntityType } from './entity/MapEntity';
 import { MapEntityPunchPacket, EntityPunchPacket } from './packet/binary/PunchPacket';
 import { Source } from './entity/EntityType';
 import { LocalizedMessagePacket, LocalizedMessage } from './packet/binary/LocalizedMessagePacket';
@@ -45,7 +45,7 @@ export default class GameServer {
     }
 
     addEntity(entity: Entity, spawn: Vector, collision: string = entity.type.collision, bodySettings: IBodyDefinition | undefined = undefined): Entity {
-        const entities: Entity[];
+        let entities: Entity[];
         if (entity instanceof Player) {
             entity.body = Matter.Bodies.circle(spawn.x, spawn.y, 25, { ...bodySettings, ...{ collisionFilter: { mask: 0x0001, category: 0x0002, group: 0 } } });
             entity.body.label = "Player";
@@ -57,7 +57,7 @@ export default class GameServer {
         }
 
         const notOwned = entity.owner ? entity.owner.ownedEntities : entities.filter(x => x.owner == undefined);
-        for (const i = 1; i <= (entity instanceof Player ? config.maxPlayers : 256 ** 2); i++) {
+        for (let i = 1; i <= (entity instanceof Player ? config.maxPlayers : 256 ** 2); i++) {
             if (notOwned.findId(i) == undefined) {
                 entity.id = i;
                 break;
@@ -77,7 +77,7 @@ export default class GameServer {
     }
 
     createBody(collisions: string = "circle:40", spawn: Vector, bodySettings: IBodyDefinition | undefined = undefined): Matter.Body {
-        const body: Matter.Body = Matter.Bodies.circle(spawn.x, spawn.y, 0, bodySettings);
+        let body: Matter.Body = Matter.Bodies.circle(spawn.x, spawn.y, 0, bodySettings);
         if (collisions != undefined) {
             for (const collision of collisions.split(";")) {
                 const collisionArgs = collision.split(":");
@@ -119,7 +119,7 @@ export default class GameServer {
                         break;
                 }
                 Matter.Body.scale(body, 0.95, 0.95);
-                body.friction = 0
+                body.friction = 0;
                 body.frictionAir = 0
             }
         }
@@ -228,7 +228,7 @@ export default class GameServer {
         Recipe.list = (await import('./data/recipes.json')).default.map(x => jsonConvert.deserialize(x, Recipe) as Recipe);
         console.log(`Loaded ${Recipe.list.length} recipes`);
 
-        this.commandManager.loadCommands();
+        await this.commandManager.loadCommands();
         this.engine = Matter.Engine.create();
         const world = this.engine.world;
         world.gravity.x = 0;
@@ -248,7 +248,7 @@ export default class GameServer {
             Matter.Bodies.rectangle(bounds.max.x, 0, 1, bounds.max.y * 2, { isStatic: true })
         ]);
 
-        const lastPos!: any;
+        let lastPos!: any;
         const collisionCells: Entity[] = [];
 
         new NanoTimer().setInterval(() => {
@@ -286,7 +286,7 @@ export default class GameServer {
                         const player = this.players.find(x => x === undefined ? false : x.attackBox === attackBox);
                         // can you handle disconnects? like not deaths in index.ts
                         // wait just
-                        if (player && player !== undefined) {
+                        if (player) {
                             const attacked = pair.bodyA.label == "attackBox" ? pair.bodyB.parent : pair.bodyA.parent;
 
                             const damage = player.inventory.equippedItem.damage;
@@ -305,7 +305,7 @@ export default class GameServer {
                                 }
                                 const item = Item.list.findId(mapEntity.type.itemId);
                                 if (item) {
-                                    const amount = mapEntity.type.tier === 0 ? 1 : 0;
+                                    let amount = mapEntity.type.tier === 0 ? 1 : 0;
                                     if (player.inventory.equippedItem && ItemType[player.inventory.equippedItem.type] == mapEntity.type.type) {
                                         amount = player.inventory.equippedItem.tier + 1 - mapEntity.type.tier;
                                         if (player.inventory.equippedItem.type == ItemType.Pitchfork) {
@@ -374,8 +374,8 @@ export default class GameServer {
                 }
 
                 const biome = player.getCurrentBiome();
-                const x = 0;
-                const y = 0;
+                let x = 0;
+                let y = 0;
                 let speed = player.type.speed;
 
                 let biomeType = biome.biomeType;
@@ -475,6 +475,7 @@ export default class GameServer {
 
                 if (!player.crafting && lastSource != player.source) {
                     for (const sourceValue in Source) {
+                        // noinspection JSUnfilteredForInLoop
                         const source: Source = Number.parseInt(sourceValue);
                         if (!isNaN(source) && source !== 0) {
                             if ((lastSource & source) != (player.source & source) && ((lastSource & source) == source || (player.source & source) == source)) {
