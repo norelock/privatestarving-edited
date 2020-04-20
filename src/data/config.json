@@ -1,0 +1,11 @@
+{
+    "port": 9987,
+    "ip": "localhost",
+    "name": "Private",
+    "maxPlayers": 10,
+    "debug": {
+        "drawEntityCollisions": false,
+        "drawCollisionContacts": false,
+        "drawMap": false
+    }
+}
