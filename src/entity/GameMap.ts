@@ -30,7 +30,7 @@ export enum BiomeType {
     Island
 }
 
-var SpeedMultipliers = {};
+let SpeedMultipliers = {};
 SpeedMultipliers[BiomeType.Forest] = 0;
 SpeedMultipliers[BiomeType.Winter] = SpeedMultipliers[BiomeType.Lava] = SpeedMultipliers[BiomeType.Cave] = -20;
 SpeedMultipliers[BiomeType.Ocean] = -70;
@@ -85,9 +85,9 @@ export class Eu1Map implements GameMap {
                 for (const rows of columns) {
                     if (rows) {
                         for (const type in rows) {
-                            var entity = rows[type];
+                            const entity = rows[type];
                             if (type && entity) {
-                                var pos: any = {};
+                                let pos: any = {};
                                 pos.typeId = type;
                                 pos.nulls = 0;
 
@@ -121,13 +121,13 @@ export class Eu1Map implements GameMap {
             }
         }
 
-        var unknownTypes: string[] = [];
+        let unknownTypes: string[] = [];
         for (const mapEntity of this.entities) {
             if (mapEntity.typeId === "h" || mapEntity.typeId === "hw" || mapEntity.typeId === "hl" || mapEntity.typeId === "sl") {
                 continue;
             }
 
-            var type = MapEntityType.list.find(x => x.id.split(";").includes(mapEntity.typeId));
+            const type = MapEntityType.list.find(x => x.id.split(";").includes(mapEntity.typeId));
             if (type) {
                 mapEntity.body = gameServer.createBody(type.collision.replace("$n", type.sizes[mapEntity.nulls]), mapEntity);
                 mapEntity.body.label = mapEntity.typeId;

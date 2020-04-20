@@ -45,7 +45,7 @@ export default class GameServer {
     }
 
     addEntity(entity: Entity, spawn: Vector, collision: string = entity.type.collision, bodySettings: IBodyDefinition | undefined = undefined): Entity {
-        var entities: Entity[];
+        const entities: Entity[];
         if (entity instanceof Player) {
             entity.body = Matter.Bodies.circle(spawn.x, spawn.y, 25, { ...bodySettings, ...{ collisionFilter: { mask: 0x0001, category: 0x0002, group: 0 } } });
             entity.body.label = "Player";
@@ -56,8 +56,8 @@ export default class GameServer {
             entities = this.entities;
         }
 
-        var notOwned = entity.owner ? entity.owner.ownedEntities : entities.filter(x => x.owner == undefined);
-        for (var i = 1; i <= (entity instanceof Player ? config.maxPlayers : 256 ** 2); i++) {
+        const notOwned = entity.owner ? entity.owner.ownedEntities : entities.filter(x => x.owner == undefined);
+        for (const i = 1; i <= (entity instanceof Player ? config.maxPlayers : 256 ** 2); i++) {
             if (notOwned.findId(i) == undefined) {
                 entity.id = i;
                 break;
@@ -77,7 +77,7 @@ export default class GameServer {
     }
 
     createBody(collisions: string = "circle:40", spawn: Vector, bodySettings: IBodyDefinition | undefined = undefined): Matter.Body {
-        var body: Matter.Body = Matter.Bodies.circle(spawn.x, spawn.y, 0, bodySettings);
+        const body: Matter.Body = Matter.Bodies.circle(spawn.x, spawn.y, 0, bodySettings);
         if (collisions != undefined) {
             for (const collision of collisions.split(";")) {
                 const collisionArgs = collision.split(":");
@@ -104,8 +104,8 @@ export default class GameServer {
                         Matter.Body.scale(body, scale, scale);
                         break;
                     default:
-                        var fixtures = this.collisions[collisionArgs[0]].fixtures;
-                        var parts: Matter.Body[] = [];
+                        const fixtures = this.collisions[collisionArgs[0]].fixtures;
+                        const parts: Matter.Body[] = [];
                         for (const fixture of fixtures) {
                             if (fixture.circle) {
                                 parts.push(Matter.Bodies.circle(spawn.x + fixture.circle.x, spawn.y + fixture.circle.y, fixture.circle.radius))
@@ -138,7 +138,7 @@ export default class GameServer {
 
         entity.state = EntityState.Delete;
 
-        for (var player of this.players.filter(p => p.visibleEntities.includes(entity))) {
+        for (const player of this.players.filter(p => p.visibleEntities.includes(entity))) {
             if (player !== undefined) {
                 Utils.sendPacket(player.ws, new DeletePacket(entity));
             }
@@ -187,14 +187,14 @@ export default class GameServer {
     async start() {
         this.collisions = await import("./data/collisions.json");
         Item.list = await this.downloadItems("https://docs.google.com/spreadsheets/d/e/2PACX-1vRIlhLSx0P44xP04e0zavfka5ypfu6D4Scmo3Qegc43Dr1MLKDK4Zi0s_ZkCCENHhvHGO3IRS3T8nIW/pub?gid=0&single=true&output=csv", Item);
-        for (var [i, item] of Item.list.filter(x => x.type === ItemType.Structure).entries()) {
+        for (const [i, item] of Item.list.filter(x => x.type === ItemType.Structure).entries()) {
             item.structureId = i + 1;
         }
         Item.hand = Item.list.findId(14)!;
         console.log(`Loaded ${Item.list.length} items`);
 
         EntityType.list = await this.downloadItems("https://docs.google.com/spreadsheets/d/e/2PACX-1vQxOUupUEXACSYHQMjHZ_EKsQ5FdE1-5zjIt38Z8g5B3wG8ASaG3-BvskNV0ti02r9u0GvPrQZ_FOFo/pub?gid=1736236970&single=true&output=csv", EntityType);
-        for (var type of EntityType.list) {
+        for (const type of EntityType.list) {
             if (type.className) {
                 switch (type.className) {
                     case "Player":
@@ -230,13 +230,13 @@ export default class GameServer {
 
         this.commandManager.loadCommands();
         this.engine = Matter.Engine.create();
-        var world = this.engine.world;
+        const world = this.engine.world;
         world.gravity.x = 0;
         world.gravity.y = 0;
 
         await this.map.initialize(this);
 
-        var bounds = this.map.mapBounds;
+        const bounds = this.map.mapBounds;
         Matter.World.add(world, [
             // top
             Matter.Bodies.rectangle(0, -1, bounds.max.x * 2, 1, { isStatic: true }),
@@ -248,8 +248,8 @@ export default class GameServer {
             Matter.Bodies.rectangle(bounds.max.x, 0, 1, bounds.max.y * 2, { isStatic: true })
         ]);
 
-        var lastPos!: any;
-        var collisionCells: Entity[] = [];
+        const lastPos!: any;
+        const collisionCells: Entity[] = [];
 
         new NanoTimer().setInterval(() => {
             for (const cell of collisionCells) {
@@ -260,7 +260,7 @@ export default class GameServer {
             for (const pair of this.engine.pairs.list as Matter.IPair[]) {
                 if (pair.isActive && pair.bodyA.label == "Player" || pair.bodyB.label == "Player") {
                     if (config.debug.drawMap) {
-                        var mapEntity = this.map.entities.find(x => x.body == pair.bodyA);
+                        const mapEntity = this.map.entities.find(x => x.body == pair.bodyA);
                         if (mapEntity && lastPos != mapEntity) {
                             console.log(mapEntity.typeId, mapEntity.nulls, pair.bodyA.position);
                             lastPos = mapEntity;
@@ -282,20 +282,20 @@ export default class GameServer {
             for (const pair of e.pairs) {
                 if (pair.isActive) {
                     if (pair.bodyA.label == "attackBox" || pair.bodyB.label == "attackBox") {
-                        var attackBox = pair.bodyA.label == "attackBox" ? pair.bodyA : pair.bodyB;
-                        var player = this.players.find(x => x === undefined ? false : x.attackBox === attackBox);
+                        const attackBox = pair.bodyA.label == "attackBox" ? pair.bodyA : pair.bodyB;
+                        const player = this.players.find(x => x === undefined ? false : x.attackBox === attackBox);
                         // can you handle disconnects? like not deaths in index.ts
                         // wait just
                         if (player && player !== undefined) {
-                            var attacked = pair.bodyA.label == "attackBox" ? pair.bodyB.parent : pair.bodyA.parent;
+                            const attacked = pair.bodyA.label == "attackBox" ? pair.bodyB.parent : pair.bodyA.parent;
 
-                            var damage = player.inventory.equippedItem.damage;
-                            var attackedPlayer = this.players.find(x => x.body == attacked);
-                            var mapEntity = this.map.entities.find(x => x.body == attacked);
-                            var entity = this.entities.find(x => x.body == attacked);
+                            const damage = player.inventory.equippedItem.damage;
+                            const attackedPlayer = this.players.find(x => x.body == attacked);
+                            const mapEntity = this.map.entities.find(x => x.body == attacked);
+                            const entity = this.entities.find(x => x.body == attacked);
                             if (attackedPlayer && player != attackedPlayer) {
                                 attackedPlayer.state |= EntityState.Hurt;
-                                var helmet = attackedPlayer.inventory.equippedHelmet;
+                                const helmet = attackedPlayer.inventory.equippedHelmet;
                                 attackedPlayer.dealDamage((damage.pvp - (helmet ? helmet.defense.pvp : 0)) || 1, player);
                                 attackedPlayer.action = true;
                             } else if (mapEntity) {
@@ -303,9 +303,9 @@ export default class GameServer {
                                 for (const otherPlayer of this.players) {
                                     Utils.sendPacket(otherPlayer.ws, packet);
                                 }
-                                var item = Item.list.findId(mapEntity.type.itemId);
+                                const item = Item.list.findId(mapEntity.type.itemId);
                                 if (item) {
-                                    var amount = mapEntity.type.tier === 0 ? 1 : 0;
+                                    const amount = mapEntity.type.tier === 0 ? 1 : 0;
                                     if (player.inventory.equippedItem && ItemType[player.inventory.equippedItem.type] == mapEntity.type.type) {
                                         amount = player.inventory.equippedItem.tier + 1 - mapEntity.type.tier;
                                         if (player.inventory.equippedItem.type == ItemType.Pitchfork) {
@@ -357,7 +357,7 @@ export default class GameServer {
                 player.sendPackets = true;
             }
         }
-    }
+    };
 
     update = (): void => {
         Matter.Engine.update(this.engine, 1000 / this.tps);
@@ -373,18 +373,18 @@ export default class GameServer {
                     player.action = true;
                 }
 
-                var biome = player.getCurrentBiome();
-                var x = 0;
-                var y = 0;
-                var speed = player.type.speed;
+                const biome = player.getCurrentBiome();
+                const x = 0;
+                const y = 0;
+                let speed = player.type.speed;
 
-                var biomeType = biome.biomeType;
+                let biomeType = biome.biomeType;
                 if (Utils.hasFlag(player.source, Source.Island)) {
                     biomeType = BiomeType.Forest;
                 } else if (Utils.hasFlag(player.source, Source.Water)) {
                     biomeType = BiomeType.Ocean;
                 }
-                speed += SpeedMultipliers[biomeType]
+                speed += SpeedMultipliers[biomeType];
 
                 if (player.inventory.equippedItem.isCombatItem()) {
                     speed -= 40;
@@ -422,7 +422,7 @@ export default class GameServer {
                 Matter.Body.setVelocity(player.body, { x: x, y: y });
             }
         }
-    }
+    };
 
     visionRefresh = (ignore: Player[] = []): void => {
         for (let player of this.players.filter(x => !ignore.includes(x))) {
@@ -459,14 +459,14 @@ export default class GameServer {
                     if (entity !== undefined) {
                         if (Math.abs(player.body.position.x - entity.body.position.x) < width && Math.abs(player.body.position.y - entity.body.position.y) < height) {
                             if (!player.visibleEntities.includes(entity)) {
-                                player.visibleEntities.push(entity)
+                                player.visibleEntities.push(entity);
                                 if (!entity.action) {
                                     Utils.sendPacket(player.ws, new UnitsPacket(entity));
                                 }
                             }
                         } else {
                             if (player.visibleEntities.includes(entity)) {
-                                player.visibleEntities.delete(entity)
+                                player.visibleEntities.delete(entity);
                                 Utils.sendPacket(player.ws, new DeletePacket(entity));
                             }
                         } 
@@ -474,31 +474,31 @@ export default class GameServer {
                 }
 
                 if (!player.crafting && lastSource != player.source) {
-                    for (var sourceValue in Source) {
-                        var source: Source = Number.parseInt(sourceValue);
+                    for (const sourceValue in Source) {
+                        const source: Source = Number.parseInt(sourceValue);
                         if (!isNaN(source) && source !== 0) {
                             if ((lastSource & source) != (player.source & source) && ((lastSource & source) == source || (player.source & source) == source)) {
                                 if (source === Source.Fire || source === Source.Workbench || source === Source.Water)
-                                    Utils.sendPacket(player.ws, new SetSourcePacket(source, Utils.hasFlag(player.source, source) ? true : false));
+                                    Utils.sendPacket(player.ws, new SetSourcePacket(source, Utils.hasFlag(player.source, source)));
                             }
                         }
                     }
                 }
             }
         }
-    }
+    };
 
     render = (): void => {
-        for (var player of this.players) {
+        for (const player of this.players) {
             if (player !== undefined) {
-                var visibleEntities = player.visibleEntities.filter(e => e.action);
+                const visibleEntities = player.visibleEntities.filter(e => e.action);
                 if (visibleEntities.length > 0) {
                     Utils.sendPacket(player.ws, new UnitsPacket(...visibleEntities));
                 }
             }
         }
 
-        for (var entity of this.entities.concat(this.players)) {
+        for (const entity of this.entities.concat(this.players)) {
             if (entity !== undefined) {
                 entity.state = EntityState.None;
                 entity.action = false;

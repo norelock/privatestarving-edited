@@ -7,7 +7,7 @@ export class SourceConverter implements JsonCustomConvert<Source> {
         return Source[value];
     }
     deserialize(json: string): Source {
-        var source = Source.None;
+        let source = Source.None;
         if(json) {
             for (const name of json.split(";")) {
                 source |= Source[name];

@@ -29,7 +29,7 @@ export default class AdminCommands {
     @Command("give")
     give(source: ICommandSource, @MetaType(Player) players: Player[], @MetaType(ItemStack) items: ItemStack[]) {
         if (players.length > 0 && items.length > 0) {
-            for (var target of players) {
+            for (const target of players) {
                 target.inventory.addItem(items);
             }
 
@@ -39,7 +39,7 @@ export default class AdminCommands {
 
     @Command("place")
     place(player: Player, gameServer: GameServer, entityTypeId: number, data1: number, data2: number) {
-        var entity = new Entity(gameServer, new EntityType(entityTypeId));
+        let entity = new Entity(gameServer, new EntityType(entityTypeId));
         entity.owner = player;
         entity.angle = player.angle;
         entity.entityData = [data1, data2];
@@ -49,7 +49,7 @@ export default class AdminCommands {
     @Command("clear")
     clear(source: ICommandSource, @MetaType(Player) players: Player[]) {
         if (players.length > 0) {
-            for (var target of players) {
+            for (const target of players) {
                 target.inventory.removeItems(target.inventory.items);
             }
 
@@ -60,11 +60,11 @@ export default class AdminCommands {
     @Command("tp")
     teleportToCords(source: ICommandSource, @MetaType(Player) players: Player[], x: number, y: number, gameServer: GameServer) {
         if (players.length > 0) {
-            x = (x * 100).clamp(gameServer.map.mapBounds.min.x, gameServer.map.mapBounds.max.x - 1);
-            y = (y * 100).clamp(gameServer.map.mapBounds.min.y, gameServer.map.mapBounds.max.y - 1);
+            const newX = (x * 100).clamp(gameServer.map.mapBounds.min.x, gameServer.map.mapBounds.max.x - 1);
+            const newY = (y * 100).clamp(gameServer.map.mapBounds.min.y, gameServer.map.mapBounds.max.y - 1);
 
-            for (var target of players) {
-                Matter.Body.setPosition(target.body, { x, y });
+            for (const target of players) {
+                Matter.Body.setPosition(target.body, { newX, newY });
             }
 
             source.sendMessage("Teleported " + players.map(x => x.nickname).join(", "));
@@ -74,7 +74,7 @@ export default class AdminCommands {
     @Command("tp")
     teleportToPlayer(source: ICommandSource, @MetaType(Player) players: Player[], destination: Player) {
         if (players.length > 0 && destination) {
-            for (var target of players) {
+            for (const target of players) {
                 Matter.Body.setPosition(target.body, destination.body.position);
             }
 
@@ -85,6 +85,7 @@ export default class AdminCommands {
     @Command("eval")
     eval(source: ICommandSource, gameServer: GameServer, code: string) {
         try {
+            // Don't use eval!!! It's really unsafe and people can wreak havoc on your code
             const result = eval(code);
             source.sendMessage(result == undefined ? "Evaluated" : result);
         } catch (error) {
