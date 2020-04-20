@@ -19,13 +19,13 @@ export class LeaderboardPacket implements BinaryPacket {
     }
 
     build(): Uint8Array {
-        var array: number[] = [];
+        let array: number[] = [];
 
-        var players = this.players.sort((a, b) => a.points - b.points);
+        const players = this.players.sort((a, b) => a.points - b.points);
         for (let index = -1; index < 10; index++) {
             const player = index == -1 ? this.player : players[index];
             if (player) {
-                var points = this.boundPoints(player.points);
+                const points = this.boundPoints(player.points);
                 array = array.concat([index == -1 ? 21 : player.id, 0].concat(points));
             }
         }

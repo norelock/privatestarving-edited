@@ -24,11 +24,11 @@ Array.prototype.findId = function (id: number | string) {
             return this.find(x => x.id == id);
         }
     }
-}
+};
 
 Array.prototype.delete = function (object: any) {
     this.splice(this.indexOf(object), 1);
-}
+};
 
 Number.prototype.clamp = function (min: number, max: number): number {
     return Math.min(Math.max(this as number, min), max);
@@ -50,8 +50,8 @@ export default abstract class Utils {
     };
 
     static sliceToBytes(x: number, size: number = 2): number[] {
-        var array = new Array<number>(size);
-        for (var i = 0; i < size; i++) {
+        let array = new Array<number>(size);
+        for (let i = 0; i < size; i++) {
             array[i] = x / Math.pow(256, i);
         }
         return array;
@@ -72,13 +72,13 @@ export default abstract class Utils {
     }
 
     static translateVector(vector: Vector, radians: number, range: number = 120): Vector {
-        var x = vector.x + range * Math.cos(radians);
-        var y = vector.y + range * Math.sin(radians);
+        const x = vector.x + range * Math.cos(radians);
+        const y = vector.y + range * Math.sin(radians);
         return { x, y }
     };
 
     static drawCollisions(body: Body, draw: (x: number, y: number) => void) {
-        for (var vector of body.vertices) {
+        for (const vector of body.vertices) {
             draw(vector.x, vector.y);
         }
     };

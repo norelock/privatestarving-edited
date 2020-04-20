@@ -12,11 +12,11 @@ export default class PlayerInventory {
     items: ItemStack[] = [];
 
     get size() {
-        return false ? 9 : 14; // bag
+        return 14; // bag
     }
 
     unEquipItem(item: Item) {
-        var did = false;
+        let did = false;
         if (item.isTool()) {
             if (this.equippedItem == item) {
                 this.equippedItem = Item.hand;
@@ -28,8 +28,10 @@ export default class PlayerInventory {
                 did = true;
             }
         }
-        if (did)
+        if (did) {
             this.player.action = true;
+        }
+
         return did;
     }
 
@@ -41,8 +43,8 @@ export default class PlayerInventory {
                 this.equippedHelmet = item;
             } else if (item.type == ItemType.Food) {
                 this.removeItem(item, RemoveType.Amount, 1);
-                for (var effect of item.onEat.split(";")) {
-                    var args = effect.split(":");
+                for (const effect of item.onEat.split(";")) {
+                    const args = effect.split(":");
                     switch (args[0]) {
                         case "food":
                             this.player.hunger += Number(args[1]);

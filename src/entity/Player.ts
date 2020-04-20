@@ -45,82 +45,87 @@ export default class Player extends Entity implements ICommandSource {
     isAttacking: boolean;
     attackInterval!: NodeJS.Timeout;
     attackBox: Matter.Body;
-    attack(gameServer: GameServer): void {
+
+    attack (gameServer: GameServer): void {
         this.state |= EntityState.Attack;
 
-        var range = this.inventory.equippedItem.range || 60;
-        var angle = Utils.binaryAngleToRadians(this.angle);
-        var vector = Utils.translateVector(this.body.position, angle, range * 1.1);
-        this.attackBox = Matter.Bodies.rectangle(vector.x, vector.y, range, 50, { isSensor: true, angle, label: "attackBox" });
+        const range = this.inventory.equippedItem.range || 60;
+        const angle = Utils.binaryAngleToRadians(this.angle);
+        const vector = Utils.translateVector(this.body.position, angle, range * 1.1);
+        this.attackBox = Matter.Bodies.rectangle(vector.x, vector.y, range, 50, {
+            isSensor: true,
+            angle,
+            label: "attackBox",
+        });
         Matter.World.add(gameServer.engine.world, this.attackBox);
 
         this.action = true;
     }
 
-    get entityData(): number[] {
+    get entityData (): number[] {
         return [
             this.inventory.equippedItem.id + this.inventory.equippedHelmet.id % 2 * 128,
-            this.inventory.equippedHelmet.id / 2
+            this.inventory.equippedHelmet.id / 2,
         ];
     }
 
     sendPackets: boolean = true;
     stats: Stats;
 
-    get temperature() {
+    get temperature () {
         return this.stats[StatType.Temperature];
     }
 
-    set temperature(value: number) {
+    set temperature (value: number) {
         this.setStat(StatType.Temperature, value);
     }
 
-    get water() {
+    get water () {
         return this.stats[StatType.Water];
     }
 
-    set water(value: number) {
+    set water (value: number) {
         this.setStat(StatType.Water, value);
     }
 
-    get hunger() {
+    get hunger () {
         return this.stats[StatType.Hunger];
     }
 
-    set hunger(value: number) {
+    set hunger (value: number) {
         this.setStat(StatType.Hunger, value);
     }
 
-    get health() {
+    get health () {
         return this.stats[StatType.Health];
     }
 
-    set health(value: number) {
+    set health (value: number) {
         if (this.stats)
             this.setStat(StatType.Health, value);
     }
 
-    get oxygen() {
+    get oxygen () {
         return this.stats[StatType.Oxygen];
     }
 
-    set oxygen(value: number) {
+    set oxygen (value: number) {
         this.setStat(StatType.Oxygen, value);
     }
 
-    get overheat() {
+    get overheat () {
         return this.stats[StatType.Overheat];
     }
 
-    set overheat(value: number) {
+    set overheat (value: number) {
         this.setStat(StatType.Overheat, value);
     }
 
-    dealDamage(value: number, damager: Entity | undefined, damageReason: KillReason = KillReason.None) {
+    dealDamage (value: number, damager: Entity | undefined, damageReason: KillReason = KillReason.None) {
         this.setStat(StatType.Health, this.health - value, damager, damageReason);
     }
 
-    setStat(stat: StatType, value: number, damager: Entity | undefined = undefined, damageReason: KillReason = KillReason.None) {
+    setStat (stat: StatType, value: number, damager: Entity | undefined = undefined, damageReason: KillReason = KillReason.None) {
         if (damageReason == KillReason.None) {
             switch (stat) {
                 case StatType.Health:
@@ -141,14 +146,12 @@ export default class Player extends Entity implements ICommandSource {
             }
         }
 
-        var max = stat === StatType.Health ? 200 : 100;
+        const max = stat === StatType.Health ? 200 : 100;
         this.stats[stat] = value;
         if (this.stats[stat] >= max) {
             this.stats[stat] = max;
-            switch (stat) {
-                case StatType.Temperature:
-                    this.setStat(StatType.Overheat, this.overheat - 2, damager, damageReason);
-                    break;
+            if (stat === StatType.Temperature) {
+                this.setStat(StatType.Overheat, this.overheat - 2, damager, damageReason);
             }
         }
         if (this.stats[stat] <= 0) {
@@ -181,26 +184,27 @@ export default class Player extends Entity implements ICommandSource {
         }
     }
 
-    asLeaderBoard(): object {
-        var jsonConvert: JsonConvert = new JsonConvert();
-        return { ...jsonConvert.serialize(this), ...jsonConvert.serialize(this.skin) };
+    asLeaderBoard (): object {
+        const jsonConvert: JsonConvert = new JsonConvert();
+        return {...jsonConvert.serialize(this), ...jsonConvert.serialize(this.skin)};
     }
 
-    sendLeaderboard(gameServer: GameServer): void {
+    sendLeaderboard (gameServer: GameServer): void {
         Utils.sendPacket(this.ws, new LeaderboardPacket(this, gameServer.players));
         //console.log(gameServer.players);
     }
 
-    sendMessage(message: string, player: Player = this): void {
+    sendMessage (message: string, player: Player = this): void {
         Utils.sendPacket(this.ws, new SendChatPacket(player.id, message));
         console.log(`${this.nickname}: ${message}`)
     }
 
     public toString = (): string => {
         return `${this.nickname} (${this.id})`;
-    }
+    };;
+    '';;
 
-    constructor(gameServer: GameServer, handshake: HandshakePacket, ws: any) {
+    constructor (gameServer: GameServer, handshake: HandshakePacket, ws: any) {
         super(gameServer, EntityType.list[0]);
 
         this.nickname = handshake.nickname;
@@ -236,7 +240,7 @@ export class PlayerSkin {
     @JsonProperty("g")
     lootBox: number;
 
-    constructor(skinId: number, accessoryId: number, bagId: number, bookId: number, lootBox: number, deadBox: number) {
+    constructor (skinId: number, accessoryId: number, bagId: number, bookId: number, lootBox: number, deadBox: number) {
         this.skinId = skinId;
         this.accessoryId = accessoryId;
         this.bagId = bagId;

@@ -35,8 +35,8 @@ export class KillPacket implements BinaryPacket {
 	}
 
     build(): Uint8Array {
-        var kills = Utils.sliceToBytes(this.kills);
-        var points = Utils.sliceToBytes(this.points, 4);
+        const kills = Utils.sliceToBytes(this.kills);
+        const points = Utils.sliceToBytes(this.points, 4);
         return new Uint8Array([25, this.reason].concat(kills, points));
     }
 }

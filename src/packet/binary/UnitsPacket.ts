@@ -11,15 +11,15 @@ export class UnitsPacket implements BinaryPacket {
     }
 
     build(): Uint8Array {
-        var array = [0, 0];
+        let array = [0, 0];
         for (const entity of this.entities) {
-            var angle = entity.angle;
-            var position = entity.body.position;
-            var entityState = entity.state;
+            const angle = entity.angle;
+            const position = entity.body.position;
+            const entityState = entity.state;
 
-            var playerId = 0;
-            var entityId = 0;
-            var entityType = 0;
+            let playerId = 0;
+            let entityId = 0;
+            let entityType = 0;
 
             if (entity instanceof Player) {
                 playerId = entity.id;
@@ -29,11 +29,11 @@ export class UnitsPacket implements BinaryPacket {
                 entityType = entity.type.id;
             }
 
-            var x = Utils.sliceToBytes(position.x);
-            var y = Utils.sliceToBytes(position.y);
-            var entityIdBytes = Utils.sliceToBytes(entityId);
-            var entityStateBytes = Utils.sliceToBytes(entityState);
-            var entityTypeBytes = Utils.sliceToBytes(entityType);
+            const x = Utils.sliceToBytes(position.x);
+            const y = Utils.sliceToBytes(position.y);
+            const entityIdBytes = Utils.sliceToBytes(entityId);
+            const entityStateBytes = Utils.sliceToBytes(entityState);
+            const entityTypeBytes = Utils.sliceToBytes(entityType);
 
             array = array.concat([playerId, angle], entityStateBytes, entityTypeBytes, x, y, entityIdBytes, entity.entityData || [0, 0], [entity.speed, 0, 0, 0]);
         }
@@ -43,10 +43,10 @@ export class UnitsPacket implements BinaryPacket {
 
 export class DeletePacket extends UnitsPacket {
     build(): Uint8Array {
-        var array = [0, 0];
+        let array = [0, 0];
         for (const entity of this.entities) {
-            var playerId = 0;
-            var entityId = 0;
+            let playerId = 0;
+            let entityId = 0;
 
             if (entity instanceof Player) {
                 playerId = entity.id;
@@ -54,7 +54,7 @@ export class DeletePacket extends UnitsPacket {
                 entityId = entity.id;
             }
 
-            var entityIdBytes = Utils.sliceToBytes(entityId);
+            const entityIdBytes = Utils.sliceToBytes(entityId);
             array = array.concat([playerId, 0, 1, 0, 0, 0, 0, 0, 0, 0], entityIdBytes, [0, 0]);
         }
         return new Uint8Array(array);

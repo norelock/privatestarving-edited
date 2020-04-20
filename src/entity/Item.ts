@@ -30,9 +30,8 @@ class DamageConverter implements JsonCustomConvert<Damage> {
         return `${damage.pvp},${damage.pve}`;
     }
     deserialize(json: any): Damage {
-        if(json)
-        {
-            var array = json.toString().split(",").map(x => Number.parseFloat(x));
+        if(json) {
+            const array = json.toString().split(",").map(x => Number.parseFloat(x));
             return { pvp: array[0], pve: array[1] };
         }
         return new Damage();

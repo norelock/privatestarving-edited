@@ -4,7 +4,6 @@ import EntityType from "../EntityType";
 import Player from "../Player";
 import { ItemStack, ItemType } from '../Item';
 import Item from '../Item';
-import Utils from "../../Utils";
 
 export enum BerriesState {
     Grown = 0,
@@ -23,7 +22,7 @@ export default class BerriesEntity extends Entity {
             if (damager.inventory.equippedItem && damager.inventory.equippedItem.id == 98) {
                 this.berriesState &= ~BerriesState.Dry;
             } else if (this.berries > 0) {
-                this.berries--;;
+                this.berries--;
                 damager.inventory.addItem([new ItemStack(Item.list.findId(4)!, Math.min(this.berries, damager.inventory.equippedItem.type === ItemType.Pitchfork ? 2 : 1))]);
             }
         }
@@ -35,11 +34,11 @@ export default class BerriesEntity extends Entity {
         setTimeout(() => {
             this.berriesState = BerriesState.Grown;
             this.action = true;
-        }, 1000 * 4)
+        }, 1000 * 4);
 
         setTimeout(() => {
             gameServer.deleteEntity(this);
-        }, 1000 * 60 * 64)
+        }, 1000 * 60 * 64);
 
         setInterval(() => {
             this.berriesState = BerriesState.Dry;

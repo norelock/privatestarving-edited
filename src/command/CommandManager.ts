@@ -41,7 +41,7 @@ export default class CommandManager {
     }
 
     async loadCommands(dir: string = __dirname) {
-        for (var file of await promisify(readdir)(dir)) {
+        for (const file of await promisify(readdir)(dir)) {
             if (file != path.parse(__filename).base) {
                 await import(path.join(dir, file));
             }
@@ -49,14 +49,15 @@ export default class CommandManager {
     }
 
     findItem(queries: string, source: ICommandSource | undefined = undefined): ItemStack[] {
-        var items: ItemStack[] = []
-        for (var [query, amountString] of queries.split(';').map(x => x.split(':'))) {
-            var amount = 1;
+        let items: ItemStack[] = [];
+        for (const [query, amountString] of queries.split(';').map(x => x.split(':'))) {
+            let amount = 1;
             if (amountString) {
-                amount = Number.parseInt(amountString)
+                amount = Number.parseInt(amountString);
                 if (!amount) {
-                    if (source)
+                    if (source) {
                         source.sendMessage("Invalid amount: " + amountString);
+                    }
                     continue;
                 }
             }
@@ -85,8 +86,8 @@ export default class CommandManager {
     }
 
     findPlayer(queries: string, source: ICommandSource | undefined = undefined): Player[] {
-        var players: Player[] = []
-        for (var query of queries.split(';')) {
+        const players: Player[] = [];
+        for (const query of queries.split(';')) {
             if (query === "*") {
                 players.push(...this.gameServer.players);
                 continue;
@@ -109,7 +110,7 @@ export default class CommandManager {
                 }
             }
 
-            const target = this.gameServer.players.find(x => x.nickname.startsWith(query))
+            const target = this.gameServer.players.find(x => x.nickname.startsWith(query));
             if (target) {
                 players.push(target);
                 continue;
@@ -135,12 +136,12 @@ export default class CommandManager {
 
     handleCommand(source: ICommandSource, args: string[]): boolean {
         if (args[0].startsWith(this.prefix)) {
-            var error = "Unknown command!";
-            for (var command of CommandManager.commands) {
+            let error = "Unknown command!";
+            for (const command of CommandManager.commands) {
                 if (this.prefix + command.name === args[0]) {
-                    var cmdArgs: any[] = new Array(command.args.length);
-                    var index = 1;
-                    for (var [i, arg] of command.args.entries()) {
+                    const cmdArgs: any[] = new Array(command.args.length);
+                    let index = 1;
+                    for (const [i, arg] of command.args.entries()) {
                         switch (arg) {
                             case Object:
                                 cmdArgs[i] = source;
@@ -172,7 +173,7 @@ export default class CommandManager {
                                 index++;
                                 break;
                             case String:
-                                var string = args[index];
+                                let string = args[index];
                                 if (i === cmdArgs.length - 1) {
                                     string += " " + args.slice(index + 1).join(" ");
                                 }
@@ -181,7 +182,7 @@ export default class CommandManager {
                                 break;
                             case Array:
                                 if (args[index]) {
-                                    var type = Reflect.getMetadata(i, command.function);
+                                    const type = Reflect.getMetadata(i, command.function);
                                     switch (type) {
                                         case Player:
                                             cmdArgs[i] = this.findPlayer(args[index], source);
@@ -196,7 +197,7 @@ export default class CommandManager {
                         }
                     }
 
-                    var cmdArgsLength = cmdArgs.filter(x => x != undefined && !Number.isNaN(x)).length;
+                    const cmdArgsLength = cmdArgs.filter(x => x != undefined && !Number.isNaN(x)).length;
                     if (cmdArgsLength == command.args.length) {
                         command.function(...cmdArgs);
                         return true;
