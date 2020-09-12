@@ -28,7 +28,7 @@
         "json2typescript": "^1.2.3",
         "matter-js": "^0.14.2",
         "nanotimer": "roblav96/nanotimer#patch-1",
-        "node-fetch": "^2.6.0",
+        "node-fetch": "^2.6.1",
         "papaparse": "^5.0.1",
         "poly-decomp": "^0.3.0",
         "reflect-metadata": "^0.1.13",
